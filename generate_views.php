@@ -30,7 +30,7 @@ if (!(file_exists($bootstrapFileName) && !is_dir($bootstrapFileName))) {
     $items = [
         'Unable to find eShop bootstrap.php file.',
         'You can override the path by using ESHOP_BOOTSTRAP_PATH environment variable.',
-        "\n"
+        "\n",
     ];
 
     $message = implode(' ', $items);
@@ -44,7 +44,7 @@ $ViewsGenerator = new ViewsGenerator();
 
 $status = (object)[
     'updateViews' => false,
-    'noException' => false
+    'noException' => false,
 ];
 
 function handleExit($status)
