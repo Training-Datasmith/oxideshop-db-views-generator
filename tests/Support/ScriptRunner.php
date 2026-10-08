@@ -33,9 +33,7 @@ final class ScriptRunner
             [
                 PHP_BINARY,
                 '-d',
-                'display_errors=0',
-                '-d',
-                'display_startup_errors=0',
+                'display_errors=stderr',
                 $scriptPath,
             ],
             $descriptorSpec,

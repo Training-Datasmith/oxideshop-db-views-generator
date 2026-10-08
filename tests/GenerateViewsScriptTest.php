@@ -26,6 +26,14 @@ final class GenerateViewsScriptTest extends TestCase
 
     private const GUIDANCE = 'Unable to find eShop bootstrap.php file. You can override the path by using ESHOP_BOOTSTRAP_PATH environment variable. ' . "\n";
 
+    /**
+     * @param array{exitCode: int|null, stdout: string, stderr: string} $result
+     */
+    private function assertEmptyStderr(array $result): void
+    {
+        self::assertSame('', $result['stderr']);
+    }
+
     public function testSuccessfulRunExitsZeroWithEmptyStdout(): void
     {
         $fixture = $this->tempRoot . '/success';
@@ -40,6 +48,7 @@ final class GenerateViewsScriptTest extends TestCase
 
         self::assertSame(0, $result['exitCode']);
         self::assertSame('', $result['stdout']);
+        $this->assertEmptyStderr($result);
         self::assertFileExists($bootstrap['resultFile']);
         $payload = json_decode((string) file_get_contents($bootstrap['resultFile']), true, 512, JSON_THROW_ON_ERROR);
         self::assertSame('OxidEsales\Eshop\Core\DbMetaDataHandler', $payload['class']);
@@ -63,6 +72,7 @@ final class GenerateViewsScriptTest extends TestCase
             'There was an error while regenerating the views. Please double check the state of database and configuration.' . "\n",
             $result['stdout']
         );
+        $this->assertEmptyStderr($result);
     }
 
     public function testThrownResultPrintsLogGuidance(): void
@@ -81,6 +91,7 @@ final class GenerateViewsScriptTest extends TestCase
             'There was an error while regenerating the views. Please look at `oxideshop.log` for more details.' . "\n",
             $result['stdout']
         );
+        self::assertStringContainsString('view generation failed', $result['stderr']);
     }
 
     public function testEnvPathOverridesWalkedBootstrap(): void
@@ -100,6 +111,7 @@ final class GenerateViewsScriptTest extends TestCase
         );
 
         self::assertSame(0, $result['exitCode']);
+        $this->assertEmptyStderr($result);
         $payload = json_decode((string) file_get_contents($envBootstrap['resultFile']), true, 512, JSON_THROW_ON_ERROR);
         self::assertSame('from-env', $payload['token']);
     }
@@ -117,6 +129,7 @@ final class GenerateViewsScriptTest extends TestCase
         );
 
         self::assertSame(0, $result['exitCode']);
+        $this->assertEmptyStderr($result);
         self::assertFileExists($bootstrap['resultFile']);
     }
 
@@ -133,6 +146,12 @@ final class GenerateViewsScriptTest extends TestCase
         );
 
         self::assertSame(0, $result['exitCode']);
+        self::assertSame('', $result['stdout']);
+        $this->assertEmptyStderr($result);
+        self::assertFileExists($bootstrap['resultFile']);
+        $payload = json_decode((string) file_get_contents($bootstrap['resultFile']), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('pad', $payload['token']);
+        self::assertSame('OxidEsales\Eshop\Core\DbMetaDataHandler', $payload['class']);
     }
 
     public function testMissingEnvPathPrintsBootstrapGuidance(): void
@@ -147,6 +166,7 @@ final class GenerateViewsScriptTest extends TestCase
         );
 
         self::assertSame(self::GUIDANCE, $result['stdout']);
+        $this->assertEmptyStderr($result);
     }
 
     public function testWhitespaceOnlyEnvPathPrintsBootstrapGuidance(): void
@@ -162,6 +182,7 @@ final class GenerateViewsScriptTest extends TestCase
         );
 
         self::assertSame(self::GUIDANCE, $result['stdout']);
+        $this->assertEmptyStderr($result);
     }
 
     public function testDirectoryEnvPathPrintsBootstrapGuidance(): void
@@ -177,6 +198,7 @@ final class GenerateViewsScriptTest extends TestCase
         );
 
         self::assertSame(self::GUIDANCE, $result['stdout']);
+        $this->assertEmptyStderr($result);
     }
 
     public function testEmptyEnvVarUsesDirectoryWalk(): void
@@ -194,6 +216,7 @@ final class GenerateViewsScriptTest extends TestCase
         );
 
         self::assertSame(0, $result['exitCode']);
+        $this->assertEmptyStderr($result);
         $resultFile = $fixture . '/source/oxnew-result.json';
         self::assertFileExists($resultFile);
         $payload = json_decode((string) file_get_contents($resultFile), true, 512, JSON_THROW_ON_ERROR);
@@ -211,6 +234,7 @@ final class GenerateViewsScriptTest extends TestCase
         $result = ScriptRunner::run($script, $fixture, []);
 
         self::assertSame(0, $result['exitCode']);
+        $this->assertEmptyStderr($result);
         $payload = json_decode(
             (string) file_get_contents($fixture . '/source/oxnew-result.json'),
             true,
@@ -231,6 +255,7 @@ final class GenerateViewsScriptTest extends TestCase
         $result = ScriptRunner::run($script, $fixture, []);
 
         self::assertSame(0, $result['exitCode']);
+        $this->assertEmptyStderr($result);
         $payload = json_decode(
             (string) file_get_contents($fixture . '/a/b/c/source/oxnew-result.json'),
             true,
@@ -251,6 +276,7 @@ final class GenerateViewsScriptTest extends TestCase
         $result = ScriptRunner::run($script, $fixture, []);
 
         self::assertSame(self::GUIDANCE, $result['stdout']);
+        $this->assertEmptyStderr($result);
         self::assertFileExists($fixture . '/source/bootstrap.php');
     }
 
@@ -266,6 +292,7 @@ final class GenerateViewsScriptTest extends TestCase
         $result = ScriptRunner::run($script, $fixture, []);
 
         self::assertSame(0, $result['exitCode']);
+        $this->assertEmptyStderr($result);
         $payload = json_decode(
             (string) file_get_contents($scriptDir . '/source/oxnew-result.json'),
             true,
@@ -287,6 +314,7 @@ final class GenerateViewsScriptTest extends TestCase
         $result = ScriptRunner::run($script, $levels, []);
 
         self::assertSame(self::GUIDANCE, $result['stdout']);
+        $this->assertEmptyStderr($result);
         self::assertFileExists($fixture . '/source/bootstrap.php');
     }
 
@@ -305,6 +333,7 @@ final class GenerateViewsScriptTest extends TestCase
         );
 
         self::assertSame(0, $result['exitCode']);
+        $this->assertEmptyStderr($result);
         $payload = json_decode((string) file_get_contents($bootstrap['resultFile']), true, 512, JSON_THROW_ON_ERROR);
         self::assertSame('OxidEsales\Eshop\Core\DbMetaDataHandler', $payload['class']);
     }
