@@ -9,5 +9,20 @@
         "psr-4": {
             "OxidEsales\\DatabaseViewsGenerator\\": "src"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "OxidEsales\\DatabaseViewsGenerator\\Tests\\": "tests/",
+            "OxidEsales\\Eshop\\Core\\": "tests/stubs/OxidEsales/Eshop/Core/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.0"
+    },
+    "config": {
+        "platform": {
+            "php": "8.3.0"
+        },
+        "sort-packages": true
     }
 }

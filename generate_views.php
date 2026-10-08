@@ -11,18 +11,22 @@ namespace OxidEsales\DatabaseViewsGenerator;
 
 $bootstrapFileName = getenv('ESHOP_BOOTSTRAP_PATH');
 if (!empty($bootstrapFileName)) {
-    $bootstrapFileName = realpath(trim(getenv('ESHOP_BOOTSTRAP_PATH')));
+    $trimmedBootstrapPath = trim($bootstrapFileName);
+    $resolvedBootstrapPath = $trimmedBootstrapPath !== '' ? realpath($trimmedBootstrapPath) : false;
+    $bootstrapFileName = is_string($resolvedBootstrapPath) ? $resolvedBootstrapPath : '';
 } else {
     $count = 0;
-    $bootstrapFileName = 'source/bootstrap.php';
+    $relativeBootstrap = 'source/bootstrap.php';
     $currentDirectory = __DIR__ . '/';
+    $bootstrapFileName = '';
     while ($count < 5) {
         $count++;
-        if (file_exists($currentDirectory . $bootstrapFileName)) {
-            $bootstrapFileName = $currentDirectory . $bootstrapFileName;
+        $candidate = $currentDirectory . $relativeBootstrap;
+        if (file_exists($candidate)) {
+            $bootstrapFileName = $candidate;
             break;
         }
-        $bootstrapFileName = '../' . $bootstrapFileName;
+        $relativeBootstrap = '../' . $relativeBootstrap;
     }
 }
 
